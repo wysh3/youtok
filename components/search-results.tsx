@@ -47,7 +47,7 @@ export default function SearchResults() {
     return (
       <div className="w-full p-4">
         <div className="text-center py-10">
-          <p className="text-muted-foreground">Enter a search term or paste a YouTube link to get started</p>
+          <p className="text-muted-foreground">Type a search term or paste a YouTube URL to discover videos</p>
         </div>
       </div>
     )
