@@ -82,7 +82,7 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
 
         <div className="p-4">
           <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-bold line-clamp-2">{video.title}</h2>
+            <h2 className="text-xl font-bold line-clamp-2 font-heading">{video.title}</h2>
             <Button
               variant="ghost"
               size="icon"

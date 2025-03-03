@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Oswald } from "next/font/google"
 import { Suspense } from "react"
 import "./globals.css"
 import "@/styles/animations.css"
@@ -11,6 +11,7 @@ const VideoProvider = dynamic(() => import("@/context/video-context").then(mod =
 const ThemeProvider = dynamic(() => import("@/components/theme-provider").then(mod => ({ default: mod.ThemeProvider })))
 
 const inter = Inter({ subsets: ["latin"] })
+const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" })
 
 export const metadata: Metadata = {
   title: "YouTok",
@@ -28,7 +29,7 @@ export default function RootLayout({
         <meta name="color-scheme" content="dark light" />
         <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
-      <body className={`${inter.className} min-h-screen bg-background font-sans antialiased`}>
+      <body className={`${inter.className} ${oswald.variable} min-h-screen bg-background font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
           <VideoProvider>
             {children}
