@@ -25,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="color-scheme" content="dark light" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
       <body className={`${inter.className} min-h-screen bg-background font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
