@@ -26,6 +26,7 @@ export default function SettingsForm() {
   const { toast } = useToast()
   const { settings, updateSettings } = useVideo()
   const [newTopic, setNewTopic] = useState<string>("") 
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const { control, handleSubmit, setValue, watch } = useForm<SettingsFormData>({
     defaultValues: {
       saveHistory: settings?.saveHistory ?? true,
@@ -35,8 +36,42 @@ export default function SettingsForm() {
     }
   })
   
-  // Watch the userTopics field to keep it in sync
+  // Watch all form fields for changes
+  const saveHistory = watch("saveHistory")
+  const trendingTopic = watch("trendingTopic")
   const userTopics = watch("userTopics") ?? []
+  const viewMode = watch("viewMode")
+
+  // Auto-save when form values change
+  useEffect(() => {
+    // Skip initial render
+    if (!lastSaved) {
+      setLastSaved(new Date())
+      return
+    }
+
+    // Debounce saving to avoid too many updates
+    const timer = setTimeout(() => {
+      updateSettings({
+        ...settings,
+        saveHistory,
+        trendingTopic,
+        userTopics,
+        viewMode
+      })
+
+      // Show subtle toast notification
+      toast({
+        title: "Settings saved",
+        description: "Your preferences have been automatically saved.",
+        duration: 2000 // shorter duration for auto-save notifications
+      })
+
+      setLastSaved(new Date())
+    }, 500) // 500ms debounce
+
+    return () => clearTimeout(timer)
+  }, [saveHistory, trendingTopic, userTopics, viewMode])
 
   // Add a new topic
   const addTopic = () => {
@@ -63,25 +98,8 @@ export default function SettingsForm() {
     setValue("userTopics", updatedTopics)
   }
 
-  const onSubmit = (data: SettingsFormData) => {
-    // Update settings through context
-    updateSettings({
-      ...settings,
-      saveHistory: data.saveHistory,
-      trendingTopic: data.trendingTopic,
-      userTopics: data.userTopics,
-      viewMode: data.viewMode
-    })
-
-    // Show success toast
-    toast({
-      title: "Settings updated",
-      description: "Your preferences have been saved."
-    })
-  }
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
+    <div className="space-y-6 p-4">
       <div className="space-y-4">
         <div className="space-y-2">
           <Label>Trending Region</Label>
@@ -163,9 +181,7 @@ export default function SettingsForm() {
         />
       </div>
 
-      <Button type="submit" className="w-full text-white">
-        Save Settings
-      </Button>
-    </form>
+      <p className="text-xs text-muted-foreground text-center mt-6">Settings are saved automatically</p>
+    </div>
   )
 }
