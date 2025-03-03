@@ -1,10 +1,13 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { Suspense } from "react"
 import "./globals.css"
-import { Toaster } from "@/components/ui/toaster"
-import { VideoProvider } from "@/context/video-context"
-import { ThemeProvider } from "@/components/theme-provider"
+import dynamic from "next/dynamic"
+
+const Toaster = dynamic(() => import("@/components/ui/toaster").then(mod => ({ default: mod.Toaster })), { ssr: false })
+const VideoProvider = dynamic(() => import("@/context/video-context").then(mod => ({ default: mod.VideoProvider })))
+const ThemeProvider = dynamic(() => import("@/components/theme-provider").then(mod => ({ default: mod.ThemeProvider })))
 
 const inter = Inter({ subsets: ["latin"] })
 
