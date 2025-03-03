@@ -54,6 +54,7 @@
     "react-day-picker": "latest",
     "react-dom": "^18",
     "react-hook-form": "latest",
+    "react-intersection-observer": "^9.15.1",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
     "sonner": "^1.7.1",
@@ -67,6 +68,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "postcss": "^8",
+    "postcss-import": "^16.1.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
