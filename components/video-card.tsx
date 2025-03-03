@@ -31,6 +31,7 @@ export default function VideoCard({ video }: VideoCardProps) {
               alt={video.title}
               width={400}
               height={225}
+              priority
               className="w-full h-full object-cover opacity-60"
             />
           </div>
