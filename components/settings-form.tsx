@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -18,24 +18,59 @@ import {
 interface SettingsFormData {
   saveHistory: boolean
   trendingTopic: string
+  userTopics: string[]
+  viewMode: "trending" | "topics"
 }
 
 export default function SettingsForm() {
   const { toast } = useToast()
   const { settings, updateSettings } = useVideo()
-  const { control, handleSubmit, setValue } = useForm<SettingsFormData>({
+  const [newTopic, setNewTopic] = useState<string>("") 
+  const { control, handleSubmit, setValue, watch } = useForm<SettingsFormData>({
     defaultValues: {
       saveHistory: settings.saveHistory,
-      trendingTopic: settings.trendingTopic
+      trendingTopic: settings.trendingTopic,
+      userTopics: settings.userTopics,
+      viewMode: settings.viewMode
     }
   })
+  
+  // Watch the userTopics field to keep it in sync
+  const userTopics = watch("userTopics") || []
+
+  // Add a new topic
+  const addTopic = () => {
+    if (!newTopic.trim()) return
+    
+    // Check if topic already exists
+    if (userTopics.includes(newTopic.trim())) {
+      toast({
+        title: "Topic already exists",
+        description: "This topic is already in your list.",
+        variant: "destructive"
+      })
+      return
+    }
+    
+    const updatedTopics = [...userTopics, newTopic.trim()]
+    setValue("userTopics", updatedTopics)
+    setNewTopic("") // Clear input field
+  }
+
+  // Remove a topic
+  const removeTopic = (topicToRemove: string) => {
+    const updatedTopics = userTopics.filter(topic => topic !== topicToRemove)
+    setValue("userTopics", updatedTopics)
+  }
 
   const onSubmit = (data: SettingsFormData) => {
     // Update settings through context
     updateSettings({
       ...settings,
       saveHistory: data.saveHistory,
-      trendingTopic: data.trendingTopic
+      trendingTopic: data.trendingTopic,
+      userTopics: data.userTopics,
+      viewMode: data.viewMode
     })
 
     // Show success toast
@@ -77,6 +112,37 @@ export default function SettingsForm() {
               </Select>
             )}
           />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label>Your Topics</Label>
+          <p className="text-sm text-muted-foreground">Add topics to customize your feed</p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newTopic}
+              onChange={(e) => setNewTopic(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTopic())}
+              placeholder="Enter a topic"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+            <Button type="button" onClick={addTopic} className="text-white">Add</Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {userTopics.map((topic) => (
+              <div key={topic} className="flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1 rounded-full">
+                <span>{topic}</span>
+                <button
+                  onClick={() => removeTopic(topic)}
+                  className="text-secondary-foreground/50 hover:text-secondary-foreground"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

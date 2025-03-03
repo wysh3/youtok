@@ -10,6 +10,8 @@ interface Settings {
   defaultSummaryLength: "short" | "long"
   saveHistory: boolean
   trendingTopic: string
+  userTopics: string[]
+  viewMode: "trending" | "topics"
 }
 
 interface VideoContextType {
@@ -54,6 +56,8 @@ export function VideoProvider({ children }: { children: ReactNode }) {
     defaultSummaryLength: "short",
     saveHistory: true,
     trendingTopic: "US",
+    userTopics: [],
+    viewMode: "trending"
   })
   const { toast } = useToast()
 
@@ -79,6 +83,8 @@ export function VideoProvider({ children }: { children: ReactNode }) {
         defaultSummaryLength: "short",
         saveHistory: true,
         trendingTopic: "US",
+        userTopics: [],
+        viewMode: "trending"
       })
     }
   }, [])

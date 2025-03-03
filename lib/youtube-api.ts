@@ -116,3 +116,32 @@ export async function searchVideos(query: string, isUrl = false, page = 1): Prom
     }
   }
 
+// Function to fetch videos by topic
+export async function fetchVideosByTopic(topic: string, page = 1): Promise<Video[]> {
+  try {
+    // Using the search endpoint with the topic as the query
+    const response = await fetch(
+      `${PIPED_BASE_URL}/search?q=${encodeURIComponent(topic)}&filter=videos&page=${page}`
+    );
+    if (!response.ok) {
+      console.error("Error fetching videos by topic:", response.status);
+      return [];
+    }
+    const data = await response.json();
+
+    const videos: Video[] = data.items.map((item: any) => ({
+      id: item.url.split("=")[1], // Extract video ID from URL
+      title: item.title,
+      thumbnail: item.thumbnail,
+      shortSummary: item.shortDescription || "", // Handle null shortDescription
+      longSummary: "", // No long summary available
+      transcriptUrl: null,
+    }));
+
+    return videos;
+  } catch (error) {
+    console.error("Error fetching videos by topic:", error);
+    return [];
+  }
+}
+
