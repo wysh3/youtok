@@ -1,16 +1,15 @@
 "use client"
 
-import { useEffect, useState, useRef, useCallback } from "react"
+import { useEffect, useState } from "react"
 import VideoCard from "@/components/video-card"
 import { useVideo } from "@/context/video-context"
 import { fetchTrendingVideos } from "@/lib/youtube-api"
 import { Loader2 } from "lucide-react"
 
 export default function Feed() {
-  const { videos, setVideos, settings, loadMoreTrendingVideos, hasMoreTrending } = useVideo()
+  const { videos, setVideos, settings } = useVideo()
   const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const observerTarget = useRef(null)
+
 
   useEffect(() => {
     async function loadTrendingVideos() {
@@ -28,29 +27,7 @@ export default function Feed() {
     loadTrendingVideos()
   }, [setVideos, settings.trendingTopic])
 
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0]
-      if (target.isIntersecting && !loadingMore && hasMoreTrending) {
-        setLoadingMore(true)
-        loadMoreTrendingVideos().finally(() => setLoadingMore(false))
-      }
-    },
-    [loadingMore, hasMoreTrending, loadMoreTrendingVideos]
-  )
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0,
-    })
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current)
-    }
-
-    return () => observer.disconnect()
-  }, [handleObserver])
   if (loading) {
     return (
       <div className="w-full p-4 flex justify-center items-center py-10">
@@ -66,16 +43,11 @@ export default function Feed() {
           <p className="text-muted-foreground">No videos to display</p>
         </div>
       ) : (
-        <>
-          <div className="space-y-6">
-            {videos.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
-          <div ref={observerTarget} className="h-10 flex items-center justify-center mt-4">
-            {loadingMore && <Loader2 className="h-6 w-6 animate-spin text-primary" />}
-          </div>
-        </>
+        <div className="space-y-6">
+          {videos.map((video) => (
+            <VideoCard key={video.id} video={video} />
+          ))}
+        </div>
       )}
     </div>
   )

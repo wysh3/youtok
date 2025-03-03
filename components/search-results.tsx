@@ -43,11 +43,23 @@ export default function SearchResults() {
     )
   }
 
+  if (!searchQuery.trim()) {
+    return (
+      <div className="w-full p-4">
+        <div className="text-center py-10">
+          <p className="text-muted-foreground">Enter a search term or paste a YouTube link to get started</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full p-4">
-      <h2 className="text-lg font-medium mb-4">
-        Search results for "{searchQuery}"
-      </h2>
+      {searchQuery && (
+        <h2 className="text-lg font-medium mb-4">
+          Search results for "{searchQuery}"
+        </h2>
+      )}
       {searchResults.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-muted-foreground">No videos found</p>
