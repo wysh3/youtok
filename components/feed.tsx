@@ -26,10 +26,10 @@ export default function Feed() {
   // Load trending videos
   useEffect(() => {
     async function loadTrendingVideos() {
-      if (settings.viewMode === "trending") {
+      if (settings?.viewMode === "trending") {
         setLoading(true)
         try {
-          const trendingVideos = await fetchTrendingVideos(settings.trendingTopic, 1)
+          const trendingVideos = await fetchTrendingVideos(settings?.trendingTopic ?? "US", 1)
           setVideos(trendingVideos)
         } catch (error) {
           console.error("Error fetching trending videos:", error)
@@ -40,12 +40,12 @@ export default function Feed() {
     }
 
     loadTrendingVideos()
-  }, [setVideos, settings.trendingTopic, settings.viewMode])
+  }, [setVideos, settings?.trendingTopic, settings?.viewMode])
 
   // Load topic videos
   useEffect(() => {
     async function loadTopicVideos() {
-      if (settings.viewMode === "topics" && settings.userTopics.length > 0) {
+      if (settings?.viewMode === "topics" && settings?.userTopics?.length > 0) {
         setLoading(true)
         try {
           const activeTopic = settings.userTopics[activeTopicIndex]
@@ -70,7 +70,7 @@ export default function Feed() {
     }
 
     loadTopicVideos()
-  }, [settings.viewMode, settings.userTopics, activeTopicIndex, topicVideos])
+  }, [settings?.viewMode, settings?.userTopics, activeTopicIndex, topicVideos])
 
   // Handle topic change
   const handleTopicChange = (index: number) => {
@@ -91,7 +91,7 @@ export default function Feed() {
       <div className="mb-4 flex justify-center">
         <ToggleGroup 
           type="single" 
-          value={settings.viewMode}
+          value={settings?.viewMode ?? "trending"}
           onValueChange={handleViewModeChange}
           className="justify-start border rounded-md p-1 w-fit"
         >
@@ -107,13 +107,13 @@ export default function Feed() {
       </div>
 
       {/* Content header */}
-      {settings.viewMode === "trending" ? (
-        <h2 className="text-lg font-medium mb-4">Trending in {settings.trendingTopic}</h2>
-      ) : settings.userTopics.length > 0 ? (
+      {settings?.viewMode === "trending" ? (
+        <h2 className="text-lg font-medium mb-4">Trending in {settings?.trendingTopic ?? "US"}</h2>
+      ) : settings?.userTopics?.length > 0 ? (
         <div className="mb-4">
           <h2 className="text-lg font-medium mb-2">Your Topics</h2>
           <div className="flex flex-wrap gap-2">
-            {settings.userTopics.map((topic, index) => (
+            {settings?.userTopics?.map((topic, index) => (
               <button
                 key={topic}
                 onClick={() => handleTopicChange(index)}
@@ -131,14 +131,14 @@ export default function Feed() {
       )}
 
       {/* Video content */}
-      {settings.viewMode === "topics" && settings.userTopics.length === 0 ? null : (
-        videos.length === 0 ? (
+      {settings?.viewMode === "topics" && settings?.userTopics?.length === 0 ? null : (
+        videos?.length === 0 ? (
           <div className="text-center py-10">
             <p className="text-muted-foreground">No videos to display</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {videos.map((video) => (
+            {videos?.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
           </div>

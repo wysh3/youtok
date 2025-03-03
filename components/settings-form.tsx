@@ -28,15 +28,15 @@ export default function SettingsForm() {
   const [newTopic, setNewTopic] = useState<string>("") 
   const { control, handleSubmit, setValue, watch } = useForm<SettingsFormData>({
     defaultValues: {
-      saveHistory: settings.saveHistory,
-      trendingTopic: settings.trendingTopic,
-      userTopics: settings.userTopics,
-      viewMode: settings.viewMode
+      saveHistory: settings?.saveHistory ?? true,
+      trendingTopic: settings?.trendingTopic ?? "US",
+      userTopics: settings?.userTopics ?? [],
+      viewMode: settings?.viewMode ?? "trending"
     }
   })
   
   // Watch the userTopics field to keep it in sync
-  const userTopics = watch("userTopics") || []
+  const userTopics = watch("userTopics") ?? []
 
   // Add a new topic
   const addTopic = () => {
