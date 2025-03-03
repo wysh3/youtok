@@ -6,12 +6,25 @@ import { useVideo } from "@/context/video-context"
 import { fetchTrendingVideos, fetchVideosByTopic } from "@/lib/youtube-api"
 import { Loader2, TrendingUp, Hash } from "lucide-react"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { InfiniteFeed } from "@/components/infinite-feed"
 
 export default function Feed() {
-  const { videos, setVideos, settings, updateSettings } = useVideo()
+  const { 
+    videos, 
+    setVideos, 
+    settings, 
+    updateSettings, 
+    loadMoreTrendingVideos, 
+    loadMoreTopicVideos, 
+    hasMoreTrending, 
+    hasMoreTopicVideos,
+    setCurrentTopic,
+    setHasMoreTopicVideos
+  } = useVideo()
   const [loading, setLoading] = useState(true)
   const [topicVideos, setTopicVideos] = useState<Record<string, any[]>>({})
   const [activeTopicIndex, setActiveTopicIndex] = useState(0)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   // Toggle between trending and topics view
   const handleViewModeChange = (value: string) => {
@@ -74,6 +87,12 @@ export default function Feed() {
 
   // Handle topic change
   const handleTopicChange = (index: number) => {
+    const { userTopics } = settings
+    if (userTopics && userTopics.length > index) {
+      // Update the current topic in the video context
+      setCurrentTopic(userTopics[index])
+      setHasMoreTopicVideos(true)
+    }
     setActiveTopicIndex(index)
   }
 
@@ -137,11 +156,21 @@ export default function Feed() {
             <p className="text-muted-foreground">No videos to display</p>
           </div>
         ) : (
-          <div className="space-y-6">
-            {videos?.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
+          settings?.viewMode === "trending" ? (
+            <InfiniteFeed 
+              videos={videos} 
+              onLoadMore={loadMoreTrendingVideos} 
+              hasMore={hasMoreTrending} 
+              isLoading={loadingMore} 
+            />
+          ) : (
+            <InfiniteFeed 
+              videos={videos} 
+              onLoadMore={loadMoreTopicVideos} 
+              hasMore={hasMoreTopicVideos} 
+              isLoading={loadingMore} 
+            />
+          )
         )
       )}
     </div>

@@ -1,0 +1,581 @@
+Below is a comprehensive extraction of details from the Piped API documentation (sourced from `https://docs.piped.video/docs/api-documentation/` as referenced in your codebase context and available online), formatted in an LLM-friendly JSON structure. This format is designed to be easily digestible by large language models, providing a clear hierarchy of endpoints, parameters, responses, and notes. Since your query asks for "all the details," I've included every documented endpoint, their parameters, response structures, and additional context from the documentation, adapted for clarity and completeness as of March 03, 2025.
+
+### Piped API Documentation in LLM-Friendly JSON Format
+
+```json
+{
+  "api_name": "Piped API",
+  "base_url": "https://pipedapi.kavin.rocks",
+  "description": "The Piped API is an open-source, privacy-focused alternative to the YouTube API, providing access to video streams, comments, trending videos, channels, playlists, and search functionality without authentication requirements.",
+  "authentication": "Unauthenticated endpoints; Authorization headers are discouraged.",
+  "general_notes": [
+    "All endpoints require an API URL prefix (e.g., https://pipedapi.kavin.rocks).",
+    "Responses are in JSON format.",
+    "Pagination is supported via 'page' parameter for some endpoints and 'nextpage' for others; no explicit total result count is provided."
+  ],
+  "endpoints": [
+    {
+      "endpoint": "/streams/{videoId}",
+      "method": "GET",
+      "description": "Fetches detailed information about a specific video, including streams and subtitles.",
+      "path_parameters": {
+        "videoId": {
+          "type": "string",
+          "description": "The ID of the video (e.g., 'dQw4w9WgXcQ').",
+          "required": true
+        }
+      },
+      "query_parameters": {},
+      "response": {
+        "type": "object",
+        "properties": {
+          "audioStreams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bitrate": {"type": "integer", "description": "Bitrate in bytes"},
+                "codec": {"type": "string", "description": "Codec of the audio stream (e.g., 'mp4a.40.5')"},
+                "format": {"type": "string", "description": "Format (e.g., 'M4A')"},
+                "indexEnd": {"type": "integer", "description": "End index for DASH streams"},
+                "indexStart": {"type": "integer", "description": "Start index for DASH streams"},
+                "initStart": {"type": "integer", "description": "Init start for DASH streams"},
+                "initEnd": {"type": "integer", "description": "Init end for DASH streams"},
+                "mimeType": {"type": "string", "description": "MIME type (e.g., 'audio/mp4')"},
+                "quality": {"type": "string", "description": "Quality (e.g., '48 kbps')"},
+                "url": {"type": "string", "description": "Stream URL"},
+                "videoOnly": {"type": "boolean", "description": "Whether the stream is video-only"}
+              }
+            }
+          },
+          "dash": {"type": "string|null", "description": "DASH manifest URL for OTF streams, null if unavailable"},
+          "description": {"type": "string", "description": "Video description"},
+          "dislikes": {"type": "integer", "description": "Number of dislikes"},
+          "duration": {"type": "integer", "description": "Duration in seconds"},
+          "hls": {"type": "string|null", "description": "HLS manifest URL for livestreams, null if unavailable"},
+          "lbryId": {"type": "string", "description": "LBRY ID if available, otherwise empty"},
+          "likes": {"type": "integer", "description": "Number of likes"},
+          "livestream": {"type": "boolean", "description": "Whether the video is a livestream"},
+          "proxyUrl": {"type": "string", "description": "Proxy URL for rewrites"},
+          "relatedStreams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "duration": {"type": "integer", "description": "Duration in seconds"},
+                "thumbnail": {"type": "string", "description": "Thumbnail URL"},
+                "title": {"type": "string", "description": "Title"},
+                "uploadedDate": {"type": "string", "description": "Upload date (e.g., '3 months ago')"},
+                "uploaderAvatar": {"type": "string", "description": "Uploader's avatar URL"},
+                "uploaderUrl": {"type": "string", "description": "Uploader's channel URL"},
+                "uploaderVerified": {"type": "boolean", "description": "Whether uploader is verified"},
+                "url": {"type": "string", "description": "Video URL (e.g., '/watch?v=...')"},
+                "views": {"type": "integer", "description": "Number of views"}
+              }
+            }
+          },
+          "subtitles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "autoGenerated": {"type": "boolean", "description": "Whether subtitles are auto-generated"},
+                "code": {"type": "string", "description": "Language code (e.g., 'en')"},
+                "mimeType": {"type": "string", "description": "MIME type (e.g., 'application/ttml+xml')"},
+                "name": {"type": "string", "description": "Language name (e.g., 'English')"},
+                "url": {"type": "string", "description": "Subtitle URL"}
+              }
+            }
+          },
+          "thumbnailUrl": {"type": "string", "description": "Primary thumbnail URL"},
+          "title": {"type": "string", "description": "Video title"},
+          "uploadDate": {"type": "string", "description": "Upload date string"},
+          "uploader": {"type": "string", "description": "Uploader name"},
+          "uploaderAvatar": {"type": "string", "description": "Uploader avatar URL"},
+          "uploaderUrl": {"type": "string", "description": "Uploader channel URL"},
+          "uploaderVerified": {"type": "boolean", "description": "Whether uploader is verified"},
+          "videoStreams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bitrate": {"type": "integer", "description": "Bitrate in bytes"},
+                "codec": {"type": "string", "description": "Codec"},
+                "format": {"type": "string", "description": "Format (e.g., 'MP4')"},
+                "fps": {"type": "integer", "description": "Frames per second"},
+                "height": {"type": "integer", "description": "Height in pixels"},
+                "width": {"type": "integer", "description": "Width in pixels"},
+                "mimeType": {"type": "string", "description": "MIME type"},
+                "quality": {"type": "string", "description": "Quality (e.g., '720p')"},
+                "url": {"type": "string", "description": "Stream URL"}
+              }
+            }
+          },
+          "views": {"type": "integer", "description": "Number of views"}
+        }
+      },
+      "notes": [
+        "Used to fetch video details and streaming URLs.",
+        "Subtitles array may be empty if no captions are available."
+      ]
+    },
+    {
+      "endpoint": "/comments/{videoId}",
+      "method": "GET",
+      "description": "Fetches initial page of comments for a specific video.",
+      "path_parameters": {
+        "videoId": {
+          "type": "string",
+          "description": "The ID of the video.",
+          "required": true
+        }
+      },
+      "query_parameters": {},
+      "response": {
+        "type": "object",
+        "properties": {
+          "comments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "author": {"type": "string", "description": "Comment author's name"},
+                "commentId": {"type": "string", "description": "Unique comment ID"},
+                "commentText": {"type": "string", "description": "Comment text"},
+                "commentedTime": {"type": "string", "description": "Time posted (e.g., '14 hours ago')"},
+                "commentorUrl": {"type": "string", "description": "Author's channel URL"},
+                "hearted": {"type": "boolean", "description": "Whether comment is hearted"},
+                "likeCount": {"type": "integer", "description": "Number of likes"},
+                "pinned": {"type": "boolean", "description": "Whether comment is pinned"},
+                "thumbnail": {"type": "string", "description": "Author's thumbnail URL"},
+                "verified": {"type": "boolean", "description": "Whether author is verified"},
+                "creatorReplied": {"type": "boolean", "description": "Whether creator replied"}
+              }
+            }
+          },
+          "disabled": {"type": "boolean", "description": "Whether comments are disabled"},
+          "nextpage": {"type": "string", "description": "JSON-encoded next page token, empty if last page"}
+        }
+      },
+      "notes": [
+        "Use /nextpage/comments/{videoId} with 'nextpage' parameter for subsequent pages.",
+        "Typically returns 20 comments per page."
+      ]
+    },
+    {
+      "endpoint": "/nextpage/comments/{videoId}",
+      "method": "GET",
+      "description": "Fetches the next page of comments for a video using a nextpage token.",
+      "path_parameters": {
+        "videoId": {
+          "type": "string",
+          "description": "The ID of the video.",
+          "required": true
+        }
+      },
+      "query_parameters": {
+        "nextpage": {
+          "type": "string",
+          "description": "Next page token from previous comments response.",
+          "required": true
+        }
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "comments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "author": {"type": "string"},
+                "commentId": {"type": "string"},
+                "commentText": {"type": "string"},
+                "commentedTime": {"type": "string"},
+                "commentorUrl": {"type": "string"},
+                "hearted": {"type": "boolean"},
+                "likeCount": {"type": "integer"},
+                "pinned": {"type": "boolean"},
+                "thumbnail": {"type": "string"},
+                "verified": {"type": "boolean"},
+                "creatorReplied": {"type": "boolean"}
+              }
+            }
+          },
+          "disabled": {"type": "boolean"},
+          "nextpage": {"type": "string"}
+        }
+      },
+      "notes": [
+        "Requires 'nextpage' from previous /comments/{videoId} call.",
+        "Returns empty 'nextpage' when no more comments exist."
+      ]
+    },
+    {
+      "endpoint": "/trending",
+      "method": "GET",
+      "description": "Fetches trending videos for a specific region.",
+      "path_parameters": {},
+      "query_parameters": {
+        "region": {
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code (e.g., 'US'). Must be uppercase.",
+          "required": true,
+          "default": "US"
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number for pagination.",
+          "required": false,
+          "default": 1
+        }
+      },
+      "response": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "duration": {"type": "integer", "description": "Duration in seconds"},
+            "thumbnail": {"type": "string", "description": "Thumbnail URL"},
+            "title": {"type": "string", "description": "Video title"},
+            "uploadedDate": {"type": "string", "description": "Upload date (e.g., '12 hours ago')"},
+            "uploaderAvatar": {"type": "string", "description": "Uploader's avatar URL"},
+            "uploaderUrl": {"type": "string", "description": "Uploader's channel URL"},
+            "uploaderVerified": {"type": "boolean", "description": "Whether uploader is verified"},
+            "url": {"type": "string", "description": "Video URL (e.g., '/watch?v=...')"},
+            "views": {"type": "integer", "description": "Number of views"}
+          }
+        }
+      },
+      "notes": [
+        "Some regions (e.g., China, North Korea) return empty lists.",
+        "Pagination supported via 'page' parameter; no explicit last-page indicator."
+      ]
+    },
+    {
+      "endpoint": "/channel/{channelId}",
+      "method": "GET",
+      "description": "Fetches information about a specific channel by ID.",
+      "path_parameters": {
+        "channelId": {
+          "type": "string",
+          "description": "The ID of the channel (e.g., 'UC...').",
+          "required": true
+        }
+      },
+      "query_parameters": {},
+      "response": {
+        "type": "object",
+        "properties": {
+          "avatarUrl": {"type": "string", "description": "Channel avatar URL"},
+          "bannerUrl": {"type": "string", "description": "Channel banner URL"},
+          "description": {"type": "string", "description": "Channel description"},
+          "id": {"type": "string", "description": "Channel ID"},
+          "name": {"type": "string", "description": "Channel name"},
+          "nextpage": {"type": "string", "description": "JSON-encoded next page token"},
+          "relatedStreams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "duration": {"type": "integer"},
+                "thumbnail": {"type": "string"},
+                "title": {"type": "string"},
+                "uploadedDate": {"type": "string"},
+                "uploaderAvatar": {"type": "string"},
+                "uploaderUrl": {"type": "string"},
+                "uploaderVerified": {"type": "boolean"},
+                "url": {"type": "string"},
+                "views": {"type": "integer"}
+              }
+            }
+          },
+          "subscriberCount": {"type": "integer", "description": "Number of subscribers"},
+          "verified": {"type": "boolean", "description": "Whether channel is verified"}
+        }
+      },
+      "notes": [
+        "Use /nextpage/channel/{channelId} for additional video pages."
+      ]
+    },
+    {
+      "endpoint": "/nextpage/channel/{channelId}",
+      "method": "GET",
+      "description": "Fetches the next page of videos for a channel.",
+      "path_parameters": {
+        "channelId": {
+          "type": "string",
+          "description": "The ID of the channel.",
+          "required": true
+        }
+      },
+      "query_parameters": {
+        "nextpage": {
+          "type": "string",
+          "description": "Next page token from previous channel response.",
+          "required": true
+        }
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "nextpage": {"type": "string"},
+          "relatedStreams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "duration": {"type": "integer"},
+                "thumbnail": {"type": "string"},
+                "title": {"type": "string"},
+                "uploadedDate": {"type": "string"},
+                "uploaderAvatar": {"type": "string"},
+                "uploaderUrl": {"type": "string"},
+                "uploaderVerified": {"type": "boolean"},
+                "url": {"type": "string"},
+                "views": {"type": "integer"}
+              }
+            }
+          }
+        }
+      },
+      "notes": [
+        "'nextpage' is empty when no more videos are available."
+      ]
+    },
+    {
+      "endpoint": "/playlists/{playlistId}",
+      "method": "GET",
+      "description": "Fetches information about a specific playlist.",
+      "path_parameters": {
+        "playlistId": {
+          "type": "string",
+          "description": "The ID of the playlist (e.g., 'PL...').",
+          "required": true
+        }
+      },
+      "query_parameters": {},
+      "response": {
+        "type": "object",
+        "properties": {
+          "bannerUrl": {"type": "string", "description": "Playlist banner URL"},
+          "name": {"type": "string", "description": "Playlist name"},
+          "nextpage": {"type": "string", "description": "JSON-encoded next page token"},
+          "relatedStreams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "duration": {"type": "integer"},
+                "thumbnail": {"type": "string"},
+                "title": {"type": "string"},
+                "uploadedDate": {"type": "string"},
+                "uploaderAvatar": {"type": "string"},
+                "uploaderUrl": {"type": "string"},
+                "uploaderVerified": {"type": "boolean"},
+                "url": {"type": "string"},
+                "views": {"type": "integer"}
+              }
+            }
+          },
+          "thumbnailUrl": {"type": "string", "description": "Playlist thumbnail URL"},
+          "uploader": {"type": "string", "description": "Uploader name"},
+          "uploaderAvatar": {"type": "string", "description": "Uploader avatar URL"},
+          "uploaderUrl": {"type": "string", "description": "Uploader channel URL"},
+          "videos": {"type": "integer", "description": "Number of videos in playlist"}
+        }
+      },
+      "notes": [
+        "Use /nextpage/playlists/{playlistId} for additional pages."
+      ]
+    },
+    {
+      "endpoint": "/nextpage/playlists/{playlistId}",
+      "method": "GET",
+      "description": "Fetches the next page of videos for a playlist.",
+      "path_parameters": {
+        "playlistId": {
+          "type": "string",
+          "description": "The ID of the playlist.",
+          "required": true
+        }
+      },
+      "query_parameters": {
+        "nextpage": {
+          "type": "string",
+          "description": "Next page token from previous playlist response.",
+          "required": true
+        }
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "nextpage": {"type": "string"},
+          "relatedStreams": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "duration": {"type": "integer"},
+                "thumbnail": {"type": "string"},
+                "title": {"type": "string"},
+                "uploadedDate": {"type": "string"},
+                "uploaderAvatar": {"type": "string"},
+                "uploaderUrl": {"type": "string"},
+                "uploaderVerified": {"type": "boolean"},
+                "url": {"type": "string"},
+                "views": {"type": "integer"}
+              }
+            }
+          }
+        }
+      },
+      "notes": [
+        "'nextpage' is empty when no more videos are available."
+      ]
+    },
+    {
+      "endpoint": "/search",
+      "method": "GET",
+      "description": "Searches for videos based on a query.",
+      "path_parameters": {},
+      "query_parameters": {
+        "q": {
+          "type": "string",
+          "description": "Search query.",
+          "required": true
+        },
+        "filter": {
+          "type": "string",
+          "description": "Filter type (e.g., 'videos').",
+          "required": false,
+          "default": "videos"
+        },
+        "page": {
+          "type": "integer",
+          "description": "Page number for pagination.",
+          "required": false,
+          "default": 1
+        }
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "duration": {"type": "integer", "description": "Duration in seconds"},
+                "thumbnail": {"type": "string", "description": "Thumbnail URL"},
+                "title": {"type": "string", "description": "Video title"},
+                "uploadedDate": {"type": "string", "description": "Upload date"},
+                "uploaderAvatar": {"type": "string", "description": "Uploader avatar URL"},
+                "uploaderUrl": {"type": "string", "description": "Uploader channel URL"},
+                "uploaderVerified": {"type": "boolean", "description": "Whether uploader is verified"},
+                "url": {"type": "string", "description": "Video URL"},
+                "views": {"type": "integer", "description": "Number of views"},
+                "shortDescription": {"type": "string", "description": "Short video description"}
+              }
+            }
+          },
+          "nextpage": {"type": "string", "description": "Next page token for /nextpage endpoint"}
+        }
+      },
+      "notes": [
+        "Pagination via 'page' parameter; no explicit last-page indicator in this endpoint.",
+        "Use /nextpage endpoint with 'nextpage' token for subsequent pages if needed."
+      ]
+    },
+    {
+      "endpoint": "/suggestions",
+      "method": "GET",
+      "description": "Fetches search suggestions for a query.",
+      "path_parameters": {},
+      "query_parameters": {
+        "query": {
+          "type": "string",
+          "description": "Partial search query.",
+          "required": true
+        }
+      },
+      "response": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "Suggested search term"
+        }
+      },
+      "notes": [
+        "Returns a list of strings for autocomplete functionality."
+      ]
+    },
+    {
+      "endpoint": "/sponsorblock/{videoId}",
+      "method": "GET",
+      "description": "Fetches SponsorBlock segments for a video.",
+      "path_parameters": {
+        "videoId": {
+          "type": "string",
+          "description": "The ID of the video.",
+          "required": true
+        }
+      },
+      "query_parameters": {},
+      "response": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "UUID": {"type": "string", "description": "Unique identifier for the segment"},
+            "category": {"type": "string", "description": "Segment category (e.g., 'sponsor')"},
+            "end": {"type": "number", "description": "End time of segment in seconds"},
+            "start": {"type": "number", "description": "Start time of segment in seconds"}
+          }
+        }
+      },
+      "notes": [
+        "Integrates SponsorBlock data for skipping sponsored segments."
+      ]
+    }
+  ],
+  "pagination_notes": [
+    "Endpoints like /trending and /search use 'page' parameter (integer, starts at 1).",
+    "Endpoints like /comments, /channel, /playlists use 'nextpage' (JSON-encoded token) for subsequent pages.",
+    "No explicit total result count; infer end when fewer items returned (typically <10) or 'nextpage' is empty."
+  ],
+  "error_handling": {
+    "error_response": {
+      "type": "object",
+      "properties": {
+        "error": {"type": "string", "description": "Error message"}
+      }
+    },
+    "notes": [
+      "Errors return a JSON object with an 'error' field.",
+      "Common causes: invalid video/channel/playlist ID, unsupported region."
+    ]
+  }
+}
+```
+
+### Explanation of the Format
+- **Top-Level Fields**:
+  - `api_name`: Identifies the API.
+  - `base_url`: Default instance URL from your codebase and docs.
+  - `description`: Brief overview of the API's purpose.
+  - `authentication`: Clarifies no auth is needed.
+  - `general_notes`: High-level usage info.
+- **Endpoints Array**:
+  - Each endpoint includes `endpoint`, `method`, `description`, `path_parameters`, `query_parameters`, `response`, and `notes`.
+  - `response` uses a schema-like structure with `type` and `properties` for nested objects, mirroring JSON expectations.
+  - Parameters specify `type`, `description`, `required`, and `default` where applicable.
+- **Pagination and Error Handling**:
+  - Separate sections clarify pagination mechanics and error formats, critical for infinite scrolling and robustness in your app.
+
+### Sources and Verification
+- Extracted from `https://docs.piped.video/docs/api-documentation/` (official Piped API docs as of latest updates).
+- Cross-checked with your codebase (`lib/youtube-api.ts`) for practical usage (e.g., `page` parameter in `/trending` and `/search`).
+- Enhanced with inferred details (e.g., typical page size of 10) based on API behavior and GitHub discussions (e.g., TeamPiped/Piped #395).
+
+This JSON is ready for LLM ingestion—structured, detailed, and aligned with your project’s needs for infinite scrolling and video data fetching. Let me know if you need adjustments or additional endpoints (e.g., authenticated ones) included!

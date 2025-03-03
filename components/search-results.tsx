@@ -1,39 +1,24 @@
 "use client"
 
-import { useEffect, useRef, useCallback, useState } from "react"
-import VideoCard from "@/components/video-card"
+import { useEffect, useState } from "react"
 import { useVideo } from "@/context/video-context"
 import { Loader2 } from "lucide-react"
+import { InfiniteFeed } from "@/components/infinite-feed"
 
 export default function SearchResults() {
   const { searchResults, searchQuery, isSearching, loadMoreSearchResults, hasMoreSearchResults } = useVideo()
   const [loadingMore, setLoadingMore] = useState(false)
-  const observerTarget = useRef(null)
-
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0]
-      if (target.isIntersecting && !loadingMore && hasMoreSearchResults) {
-        setLoadingMore(true)
-        loadMoreSearchResults().finally(() => setLoadingMore(false))
+  
+  const handleLoadMore = async () => {
+    if (!loadingMore && hasMoreSearchResults) {
+      setLoadingMore(true)
+      try {
+        await loadMoreSearchResults()
+      } finally {
+        setLoadingMore(false)
       }
-    },
-    [loadingMore, hasMoreSearchResults, loadMoreSearchResults]
-  )
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0,
-    })
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current)
     }
-
-    return () => observer.disconnect()
-  }, [handleObserver])
+  }
 
   if (isSearching && searchResults.length === 0) {
     return (
@@ -65,16 +50,14 @@ export default function SearchResults() {
           <p className="text-muted-foreground">No videos found</p>
         </div>
       ) : (
-        <>
-          <div className="space-y-6 svg-fade-in">
-            {searchResults.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
-          <div ref={observerTarget} className="h-10 flex items-center justify-center mt-4 glassmorphic backdrop-blur-md rounded-lg">
-            {loadingMore && <Loader2 className="h-6 w-6 animate-spin text-primary svg-pulse" />
-}</div>
-        </>
+        <div className="svg-fade-in">
+          <InfiniteFeed
+            videos={searchResults}
+            onLoadMore={handleLoadMore}
+            hasMore={hasMoreSearchResults}
+            isLoading={loadingMore}
+          />
+        </div>
       )}
     </div>
   )

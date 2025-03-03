@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import type { Video } from "@/types/video"
 import { useToast } from "@/components/ui/use-toast"
 import { searchVideosApi } from "@/services/youtube-api"
-import { fetchTrendingVideos } from "@/lib/youtube-api"
+import { fetchTrendingVideos, fetchVideosByTopic } from "@/lib/youtube-api"
 
 interface Settings {
   defaultSummaryLength: "short" | "long"
@@ -31,11 +31,15 @@ interface VideoContextType {
   updateSettings: (settings: Settings) => void
   loadMoreTrendingVideos: () => Promise<void>
   loadMoreSearchResults: () => Promise<void>
+  loadMoreTopicVideos: () => Promise<void>
   hasMoreTrending: boolean
   hasMoreSearchResults: boolean
+  hasMoreTopicVideos: boolean
   searchHistory: string[]
   addToSearchHistory: (query: string) => void
   clearSearchHistory: () => void
+  setCurrentTopic: (topic: string) => void
+  setHasMoreTopicVideos: (hasMore: boolean) => void
 }
 
 const VideoContext = createContext<VideoContextType | undefined>(undefined)
@@ -50,8 +54,11 @@ export function VideoProvider({ children }: { children: ReactNode }) {
   const [isSearching, setIsSearching] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchPage, setSearchPage] = useState(1)
+  const [topicPage, setTopicPage] = useState<Record<string, number>>({}) // Track page number for each topic
+  const [currentTopic, setCurrentTopic] = useState<string>("") // Track current active topic
   const [hasMoreTrending, setHasMoreTrending] = useState(true)
   const [hasMoreSearchResults, setHasMoreSearchResults] = useState(true)
+  const [hasMoreTopicVideos, setHasMoreTopicVideos] = useState(true)
   const [settings, setSettings] = useState<Settings>({
     defaultSummaryLength: "short",
     saveHistory: true,
@@ -177,9 +184,16 @@ export function VideoProvider({ children }: { children: ReactNode }) {
       if (page === 1) {
         setSearchResults(results)
       } else {
-        setSearchResults(prev => [...prev, ...results])
+        // Filter out duplicates by checking video IDs
+        setSearchResults(prev => {
+          const existingIds = new Set(prev.map(video => video.id))
+          const uniqueNewResults = results.filter(video => !existingIds.has(video.id))
+          return [...prev, ...uniqueNewResults]
+        })
       }
-      setHasMoreSearchResults(results.length === 10) // Assuming each page returns 10 items
+      // Only set hasMoreSearchResults to false if we got zero results
+      // This allows infinite scrolling to continue as long as there are results
+      setHasMoreSearchResults(results.length > 0)
       setSearchPage(page)
     } catch (error) {
       console.error("Error searching videos:", error)
@@ -207,6 +221,16 @@ export function VideoProvider({ children }: { children: ReactNode }) {
     setCurrentPage(1)
     setHasMoreTrending(true)
   }, [settings.trendingTopic])
+  
+  // Reset topic pagination when user topics change
+  useEffect(() => {
+    if (settings.viewMode === "topics" && settings.userTopics.length > 0) {
+      const activeTopic = settings.userTopics[0]
+      setCurrentTopic(activeTopic)
+      setTopicPage({})
+      setHasMoreTopicVideos(true)
+    }
+  }, [settings.userTopics])
 
   const loadMoreTrendingVideos = async () => {
     if (!hasMoreTrending) return
@@ -222,6 +246,28 @@ export function VideoProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Error loading more trending videos:", error)
       setHasMoreTrending(false)
+    }
+  }
+
+  const loadMoreTopicVideos = async () => {
+    if (!currentTopic || !hasMoreTopicVideos) return
+    
+    try {
+      const nextPage = (topicPage[currentTopic] || 1) + 1
+      const moreVideos = await fetchVideosByTopic(currentTopic, nextPage)
+      
+      if (moreVideos.length > 0) {
+        setVideos(prev => [...prev, ...moreVideos])
+        setTopicPage(prev => ({
+          ...prev,
+          [currentTopic]: nextPage
+        }))
+      } else {
+        setHasMoreTopicVideos(false)
+      }
+    } catch (error) {
+      console.error("Error loading more topic videos:", error)
+      setHasMoreTopicVideos(false)
     }
   }
 
@@ -248,11 +294,15 @@ export function VideoProvider({ children }: { children: ReactNode }) {
         updateSettings,
         loadMoreTrendingVideos,
         loadMoreSearchResults,
+        loadMoreTopicVideos,
         hasMoreTrending,
         hasMoreSearchResults,
+        hasMoreTopicVideos,
         searchHistory,
         addToSearchHistory,
         clearSearchHistory,
+        setCurrentTopic,
+        setHasMoreTopicVideos,
       }}
     >
       {children}
