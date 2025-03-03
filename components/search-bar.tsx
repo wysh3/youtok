@@ -23,7 +23,7 @@ export default function SearchBar() {
       searchVideos(query, true)
     } else {
       // Otherwise, perform a regular search
-      searchVideos(query)
+      searchVideos(query, false)
     }
   }
 
