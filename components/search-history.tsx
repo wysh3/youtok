@@ -18,7 +18,7 @@ export default function SearchHistory() {
           <Clock className="h-3 w-3 mr-1" />
           Recent Searches
         </div>
-        <Button variant="ghost" size="sm" onClick={clearSearchHistory} className="h-6 px-2">
+        <Button variant="ghost" size="sm" onClick={clearSearchHistory} className="h-6 px-2" type="button">
           <Trash2 className="h-3 w-3" />
           <span className="sr-only">Clear search history</span>
         </Button>

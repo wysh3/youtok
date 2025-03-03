@@ -15,17 +15,24 @@ export default function SearchBar() {
   const [isInputFocused, setIsInputFocused] = useState(false)
   const { searchVideos } = useVideo()
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!query.trim()) return
 
-    // Check if the query is a YouTube URL
-    const videoId = extractVideoId(query)
-    if (videoId) {
-      // If it's a URL, search for that specific video
-      searchVideos(query, true)
-    } else {
-      // Otherwise, perform a regular search
-      searchVideos(query, false)
+    try {
+      // Check if the query is a YouTube URL
+      const videoId = extractVideoId(query)
+      if (videoId) {
+        // If it's a URL, search for that specific video
+        await searchVideos(query, true)
+      } else {
+        // Otherwise, perform a regular search
+        await searchVideos(query, false)
+      }
+      // Close the search history dropdown after search
+      setIsInputFocused(false)
+    } catch (error) {
+      console.error('Error during search:', error)
     }
   }
 
@@ -39,14 +46,19 @@ export default function SearchBar() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsInputFocused(true)}
-            onBlur={() => setIsInputFocused(false)}
+            onBlur={(e) => {
+              // Only hide search history if clicking outside the form
+              if (!e.currentTarget.form?.contains(e.relatedTarget as Node)) {
+                setIsInputFocused(false)
+              }
+            }}
             className="pr-10"
           />
           {extractVideoId(query) && (
             <LinkIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary" />
           )}
           {isInputFocused && (
-            <div className="absolute w-full mt-1 bg-background border rounded-md shadow-lg z-10">
+            <div className="absolute w-full mt-1 bg-background border rounded-md shadow-lg z-50">
               <SearchHistory />
             </div>
           )}
