@@ -38,7 +38,7 @@ export default function SearchResults() {
   if (isSearching && searchResults.length === 0) {
     return (
       <div className="w-full p-4 flex justify-center items-center py-10">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary svg-pulse" />
       </div>
     )
   }
@@ -46,7 +46,7 @@ export default function SearchResults() {
   if (!searchQuery.trim()) {
     return (
       <div className="w-full p-4">
-        <div className="text-center py-10">
+        <div className="text-center py-10 glassmorphic backdrop-blur-lg rounded-lg p-4">
           <p className="text-muted-foreground">Type a search term or paste a YouTube URL to discover videos</p>
         </div>
       </div>
@@ -61,19 +61,19 @@ export default function SearchResults() {
         </h2>
       )}
       {searchResults.length === 0 ? (
-        <div className="text-center py-10">
+        <div className="text-center py-10 glassmorphic backdrop-blur-lg rounded-lg p-4">
           <p className="text-muted-foreground">No videos found</p>
         </div>
       ) : (
         <>
-          <div className="space-y-6">
+          <div className="space-y-6 svg-fade-in">
             {searchResults.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
           </div>
-          <div ref={observerTarget} className="h-10 flex items-center justify-center mt-4">
-            {loadingMore && <Loader2 className="h-6 w-6 animate-spin text-primary" />}
-          </div>
+          <div ref={observerTarget} className="h-10 flex items-center justify-center mt-4 glassmorphic backdrop-blur-md rounded-lg">
+            {loadingMore && <Loader2 className="h-6 w-6 animate-spin text-primary svg-pulse" />
+}</div>
         </>
       )}
     </div>

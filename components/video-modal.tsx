@@ -86,6 +86,7 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
             <Button
               variant="ghost"
               size="icon"
+              className="h-8 w-8 flex items-center justify-center rounded-sm bg-black/10 backdrop-blur-sm hover:bg-black/15 transition-colors duration-200"
               onClick={() => toggleFavorite(video)}
             >
               <Heart
@@ -138,8 +139,8 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
                 window.open(`https://youtube.com/watch?v=${video.id}`, "_blank")
               }
             >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Watch on YouTube
+              <ExternalLink className="h-4 w-4 mr-2 text-white" />
+              <span className="text-white">Watch on YouTube</span>
             </Button>
           </div>
         </div>

@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast"
 import { useVideo } from "@/context/video-context"
 
 interface SettingsFormData {
-  darkMode: boolean
   saveHistory: boolean
 }
 
@@ -18,7 +17,6 @@ export default function SettingsForm() {
   const { settings, updateSettings } = useVideo()
   const { control, handleSubmit, setValue } = useForm<SettingsFormData>({
     defaultValues: {
-      darkMode: settings.darkMode,
       saveHistory: settings.saveHistory
     }
   })
@@ -27,7 +25,6 @@ export default function SettingsForm() {
     // Update settings through context
     updateSettings({
       ...settings,
-      darkMode: data.darkMode,
       saveHistory: data.saveHistory
     })
 
@@ -40,22 +37,7 @@ export default function SettingsForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <Label>Dark Mode</Label>
-          <p className="text-sm text-muted-foreground">Toggle dark theme</p>
-        </div>
-        <Controller
-          name="darkMode"
-          control={control}
-          render={({ field }) => (
-            <Switch
-              checked={field.value}
-              onCheckedChange={field.onChange}
-            />
-          )}
-        />
-      </div>
+
 
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
@@ -74,7 +56,7 @@ export default function SettingsForm() {
         />
       </div>
 
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full text-white">
         Save Settings
       </Button>
     </form>

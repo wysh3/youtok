@@ -40,15 +40,15 @@ export default function Header() {
               placeholder="Search videos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-secondary/50 focus-visible:ring-gray-500"
+              className="w-full glassmorphic backdrop-blur-lg bg-background/30 dark:bg-background/20 focus-visible:ring-gray-500"
             />
             <Button
               type="submit"
               size="icon"
               variant="ghost"
-              className="absolute right-0 top-0 h-full hover:bg-gray-200 dark:hover:bg-gray-700"
+              className="absolute right-0 top-0 h-full frosted-glass-hover"
             >
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4 search-icon-animate" />
             </Button>
           </div>
         </form>
@@ -57,16 +57,16 @@ export default function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="frosted-glass-hover"
           >
-            <Bell className="h-5 w-5" />
+            <Bell className="h-5 w-5 svg-pulse" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="frosted-glass-hover"
           >
-            <User className="h-5 w-5" />
+            <User className="h-5 w-5 svg-fade-in" />
           </Button>
         </div>
       </div>

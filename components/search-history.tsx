@@ -18,21 +18,21 @@ export default function SearchHistory() {
           <Clock className="h-3 w-3 mr-1" />
           Recent Searches
         </div>
-        <Button variant="ghost" size="sm" onClick={clearSearchHistory} className="h-6 px-2" type="button">
+        <Button variant="ghost" size="sm" onClick={clearSearchHistory} className="h-6 px-2 frosted-glass-hover" type="button">
           <Trash2 className="h-3 w-3" />
           <span className="sr-only">Clear search history</span>
         </Button>
       </div>
       <div className="flex flex-wrap gap-2">
-        {searchHistory.map((query) => (
+        {searchHistory.map((query, index) => (
           <Button
             key={query}
             variant="secondary"
             size="sm"
-            className="text-xs"
+            className={`text-xs glassmorphic max-w-full history-item-animate stagger-item-${Math.min(index + 1, 5)}`}
             onClick={() => searchVideos(query, false)}
           >
-            {query}
+            <span className="truncate">{query}</span>
           </Button>
         ))}
       </div>

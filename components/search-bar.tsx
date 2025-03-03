@@ -52,19 +52,19 @@ export default function SearchBar() {
                 setIsInputFocused(false)
               }
             }}
-            className="pr-10"
+            className="pr-10 glassmorphic backdrop-blur-lg bg-background/30 dark:bg-background/20 dark:text-foreground border-none"
           />
           {extractVideoId(query) && (
-            <LinkIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary" />
+            <LinkIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary link-icon-animate" />
           )}
           {isInputFocused && (
-            <div className="absolute w-full mt-1 bg-background border rounded-md shadow-lg z-50">
+            <div className="absolute w-full mt-1 glassmorphic backdrop-blur-xl bg-background/30 dark:bg-background/20 border-none shadow-lg shadow-black/10 dark:shadow-black/30 z-50">
               <SearchHistory />
             </div>
           )}
         </div>
-        <Button type="submit" size="icon">
-          <SearchIcon className="h-4 w-4" />
+        <Button type="submit" size="icon" className="glassmorphic frosted-glass-hover backdrop-blur-lg bg-background/30 dark:bg-background/20 hover:bg-background/40 dark:hover:bg-background/30 border-none">
+          <SearchIcon className="h-4 w-4 text-white search-icon-animate" />
           <span className="sr-only">Search</span>
         </Button>
       </div>

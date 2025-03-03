@@ -8,7 +8,6 @@ import { fetchTrendingVideos } from "@/lib/youtube-api"
 
 interface Settings {
   defaultSummaryLength: "short" | "long"
-  darkMode: boolean
   saveHistory: boolean
   trendingTopic: string
 }
@@ -53,7 +52,6 @@ export function VideoProvider({ children }: { children: ReactNode }) {
   const [hasMoreSearchResults, setHasMoreSearchResults] = useState(true)
   const [settings, setSettings] = useState<Settings>({
     defaultSummaryLength: "short",
-    darkMode: true,
     saveHistory: true,
     trendingTopic: "US",
   })
@@ -79,7 +77,6 @@ export function VideoProvider({ children }: { children: ReactNode }) {
     if (storedSettings) {
       setSettings(JSON.parse(storedSettings || "null") || {
         defaultSummaryLength: "short",
-        darkMode: true,
         saveHistory: true,
         trendingTopic: "US",
       })
@@ -87,12 +84,9 @@ export function VideoProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (settings.darkMode) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
-  }, [settings.darkMode])
+    // Always use dark mode
+    document.documentElement.classList.add("dark")
+  }, [])
 
   useEffect(() => {
     localStorage.setItem("youtok-favorites", JSON.stringify(favorites))
