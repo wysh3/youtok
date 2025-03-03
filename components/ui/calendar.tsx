@@ -3,6 +3,7 @@
 import type * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
+import "react-day-picker/dist/style.css"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -22,7 +23,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
@@ -44,8 +45,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        // Use `ChevronLeft` and `ChevronRight` directly in the `nav_button_previous` and `nav_button_next`
+        // No need for IconLeft/IconRight; customize via CSS or nav rendering if needed
       }}
       {...props}
     />
@@ -54,4 +55,3 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
 Calendar.displayName = "Calendar"
 
 export { Calendar }
-
