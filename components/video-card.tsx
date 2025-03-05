@@ -23,7 +23,10 @@ export default function VideoCard({ video }: VideoCardProps) {
 
   return (
     <>
-      <div className="w-full rounded-lg overflow-hidden shadow-md mb-4 bg-card glassmorphic-card">
+      <div 
+        className="w-full rounded-lg overflow-hidden shadow-md mb-4 bg-card glassmorphic-card cursor-pointer"
+        onClick={handleOpenModal}
+      >
         <div className="relative aspect-video">
           <Image
             src={video.thumbnail || "/placeholder.svg"}
@@ -36,7 +39,7 @@ export default function VideoCard({ video }: VideoCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="flex justify-between items-start">
-                <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 font-heading">{video.title}</h3>
+                <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 font-heading hover:underline">{video.title}</h3>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -52,9 +55,6 @@ export default function VideoCard({ video }: VideoCardProps) {
                   </span>
                 </Button>
               </div>
-              <Button onClick={handleOpenModal} className="w-full mt-2" variant="secondary">
-                Read More
-              </Button>
             </div>
           </div>
         </div>
