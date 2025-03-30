@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import VideoCard from "./video-card"
-import { useVideo } from "@/context/video-context"
+import { useVideoFeed as useVideo } from "@/context/video-feed-context"
 import { useInView } from "react-intersection-observer"
 import { Loader2 } from "lucide-react"
 import type { Video } from "@/types/video"
