@@ -1,12 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useVideo } from "@/context/video-context"
+import { useSearch } from "@/context/search-context"
 import { Loader2 } from "lucide-react"
 import { InfiniteFeed } from "@/components/infinite-feed"
 
 export default function SearchResults() {
-  const { searchResults, searchQuery, isSearching, loadMoreSearchResults, hasMoreSearchResults } = useVideo()
+  const { searchResults, searchQuery, isSearching, loadMoreSearchResults, hasMoreSearchResults } = useSearch()
   const [loadingMore, setLoadingMore] = useState(false)
   
   const handleLoadMore = async () => {

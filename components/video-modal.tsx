@@ -5,7 +5,8 @@ import Image from "next/image";
 import { X, Heart, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useVideo } from "@/context/video-context";
+import { useFavorites } from "@/context/favorites-context";
+import { useHistory } from "@/context/history-context";
 import type { Video } from "@/types/video";
 import { fetchVideoDetails } from "@/lib/youtube-api";
 
@@ -16,7 +17,8 @@ interface VideoModalProps {
 }
 
 export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) {
-  const { toggleFavorite, isVideoFavorite } = useVideo();
+  const { toggleFavorite, isVideoFavorite } = useFavorites();
+  const { addToHistory } = useHistory();
   const [activeTab, setActiveTab] = useState("short");
   const [videoDetails, setVideoDetails] = useState<Video | null>(null);
   const [transcript, setTranscript] = useState<string | null>(null);
@@ -50,6 +52,7 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
       };
 
       loadVideoDetails();
+      addToHistory(video); // Add video to history when modal opens
     } else {
       setVideoDetails(null); // Reset details when modal is closed
       setTranscript(null);
@@ -59,8 +62,8 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-      <div className="bg-card rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-auto">
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-lg flex items-center justify-center">
+      <div className="glassmorphic-card w-full max-w-md max-h-[90vh] overflow-auto">
         <div className="relative">
           <Image
             src={video.thumbnail || "/placeholder.svg"}
@@ -72,7 +75,7 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-2 right-2 bg-black/50 text-white hover:bg-black/70"
+            className="absolute top-2 right-2 glassmorphic text-white hover:bg-white/20"
             onClick={onClose}
           >
             <X className="h-5 w-5" />
@@ -86,7 +89,7 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 flex items-center justify-center rounded-sm bg-black/10 backdrop-blur-sm hover:bg-black/15 transition-colors duration-200"
+              className="h-8 w-8 flex items-center justify-center rounded-sm glassmorphic hover:bg-white/20 transition-colors duration-200"
               onClick={() => toggleFavorite(video)}
             >
               <Heart

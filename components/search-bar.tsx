@@ -6,14 +6,14 @@ import { useState } from "react"
 import { SearchIcon, LinkIcon } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useVideo } from "@/context/video-context"
+import { useSearch } from "@/context/search-context"
 import { extractVideoId } from "@/lib/youtube-api"
 import SearchHistory from "@/components/search-history"
 
 export default function SearchBar() {
   const [query, setQuery] = useState("")
   const [isInputFocused, setIsInputFocused] = useState(false)
-  const { searchVideos } = useVideo()
+  const { searchVideos } = useSearch()
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()

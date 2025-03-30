@@ -8,8 +8,8 @@ export default function BottomNavigation() {
   const pathname = usePathname()
 
   return (
-    <div className="fixed md:left-0 md:top-0 md:h-full md:w-80 md:flex-col bottom-0 left-0 right-0 bg-background border-t md:border-t-0 md:border-r flex items-center justify-center py-2 z-50">
-      <div className="flex md:flex-col w-full max-w-screen-sm justify-around items-center gap-2 px-4 md:px-6 md:py-8">
+    <div className="fixed md:left-0 md:top-0 md:h-full md:w-80 md:flex-col bottom-0 left-0 right-0 bg-background border-t border-border/50 md:border-t-0 md:border-r flex items-center justify-center py-2 z-50">
+      <div className="flex md:flex-col w-full max-w-screen-sm justify-around items-center gap-2 px-4 md:px-6 md:py-8 bg-background">
         <div className="hidden md:flex items-center justify-center w-full mb-6 -mt-16">
           <Link href="/" className="text-3xl font-bold">
             <span className="text-primary">You</span>

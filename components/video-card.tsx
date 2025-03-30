@@ -5,7 +5,8 @@ import Image from "next/image"
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import VideoModal from "@/components/video-modal"
-import { useVideo } from "@/context/video-context"
+import { useFavorites } from "@/context/favorites-context"
+import { useHistory } from "@/context/history-context"
 import type { Video } from "@/types/video"
 
 interface VideoCardProps {
@@ -14,7 +15,8 @@ interface VideoCardProps {
 
 export default function VideoCard({ video }: VideoCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { toggleFavorite, isVideoFavorite, addToHistory } = useVideo()
+  const { toggleFavorite, isVideoFavorite } = useFavorites()
+  const { addToHistory } = useHistory()
 
   const handleOpenModal = () => {
     setIsModalOpen(true)
@@ -43,7 +45,7 @@ export default function VideoCard({ video }: VideoCardProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-white h-8 w-8 flex items-center justify-center rounded-sm bg-black/20 backdrop-blur-sm hover:bg-black/25 transition-colors duration-200"
+                  className="text-white h-8 w-8 flex items-center justify-center rounded-sm glassmorphic hover:bg-white/20 transition-colors duration-200"
                   onClick={(e) => {
                     e.stopPropagation()
                     toggleFavorite(video)

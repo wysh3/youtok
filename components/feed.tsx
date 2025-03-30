@@ -2,25 +2,26 @@
 
 import { useEffect, useState } from "react"
 import VideoCard from "@/components/video-card"
-import { useVideo } from "@/context/video-context"
+import { useVideoFeed } from "@/context/video-feed-context"
+import { useSettings } from "@/context/settings-context"
 import { fetchTrendingVideos, fetchVideosByTopic } from "@/lib/youtube-api"
 import { Loader2, TrendingUp, Hash } from "lucide-react"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { InfiniteFeed } from "@/components/infinite-feed"
 
 export default function Feed() {
-  const { 
-    videos, 
-    setVideos, 
-    settings, 
-    updateSettings, 
-    loadMoreTrendingVideos, 
-    loadMoreTopicVideos, 
-    hasMoreTrending, 
+  const {
+    videos,
+    setVideos,
+    loadMoreTrendingVideos,
+    loadMoreTopicVideos,
+    hasMoreTrending,
     hasMoreTopicVideos,
     setCurrentTopic,
-    setHasMoreTopicVideos
-  } = useVideo()
+    currentTopic,
+    isLoading
+  } = useVideoFeed()
+  const { settings, updateSettings } = useSettings()
   const [loading, setLoading] = useState(true)
   const [topicVideos, setTopicVideos] = useState<Record<string, any[]>>({})
   const [activeTopicIndex, setActiveTopicIndex] = useState(0)
@@ -86,12 +87,11 @@ export default function Feed() {
   }, [settings?.viewMode, settings?.userTopics, activeTopicIndex, topicVideos])
 
   // Handle topic change
-  const handleTopicChange = (index: number) => {
+  const handleTopicChange = async (index: number) => {
     const { userTopics } = settings
     if (userTopics && userTopics.length > index) {
       // Update the current topic in the video context
-      setCurrentTopic(userTopics[index])
-      setHasMoreTopicVideos(true)
+      await setCurrentTopic(userTopics[index])
     }
     setActiveTopicIndex(index)
   }
@@ -132,7 +132,7 @@ export default function Feed() {
         <div className="mb-4">
           <h2 className="text-lg font-medium mb-2">Your Topics</h2>
           <div className="flex flex-wrap gap-2">
-            {settings?.userTopics?.map((topic, index) => (
+            {settings?.userTopics?.map((topic: string, index: number) => (
               <button
                 key={topic}
                 onClick={() => handleTopicChange(index)}

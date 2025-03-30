@@ -1,12 +1,13 @@
 "use client"
 
-import { useVideo } from "@/context/video-context"
+import { useHistory } from "@/context/history-context"
+import type { Video } from "@/types/video"
 import VideoCard from "@/components/video-card"
 import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
 
 export default function HistoryList() {
-  const { history, clearHistory } = useVideo()
+  const { history, clearHistory } = useHistory()
 
   if (history.length === 0) {
     return (
@@ -26,7 +27,7 @@ export default function HistoryList() {
         </Button>
       </div>
       <div className="space-y-6">
-        {history.map((video) => (
+        {history.map((video: Video) => (
           <VideoCard key={video.id} video={video} />
         ))}
       </div>

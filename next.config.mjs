@@ -7,7 +7,7 @@ const config = {
       { protocol: 'https', hostname: 'img.youtube.com' },
       { protocol: 'https', hostname: 'yt3.ggpht.com' },
       { protocol: 'https', hostname: 'i.imgur.com' },
-      { protocol: 'https', hostname: 'pipedproxy.drgns.space' }
+      { protocol: 'https', hostname: 'pipedproxy.leptons.xyz' }
     ],
   },
 };

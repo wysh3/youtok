@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { useVideo } from "@/context/video-context"
+import { useSettings } from "@/context/settings-context"
 import {
   Select,
   SelectContent,
@@ -24,7 +24,7 @@ interface SettingsFormData {
 
 export default function SettingsForm() {
   const { toast } = useToast()
-  const { settings, updateSettings } = useVideo()
+  const { settings, updateSettings } = useSettings()
   const [newTopic, setNewTopic] = useState<string>("") 
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const { control, handleSubmit, setValue, watch } = useForm<SettingsFormData>({

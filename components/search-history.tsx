@@ -1,13 +1,15 @@
 "use client"
 
-import { useVideo } from "@/context/video-context"
+import { useSearch } from "@/context/search-context"
+import { useHistory } from "@/context/history-context"
 import { Button } from "@/components/ui/button"
 import { Trash2, Clock } from "lucide-react"
 
 export default function SearchHistory() {
-  const { searchHistory, clearSearchHistory, searchVideos } = useVideo()
+  const { searchVideos } = useSearch()
+  const { searchHistory, clearSearchHistory } = useHistory()
 
-  if (searchHistory.length === 0) {
+  if (!searchHistory || searchHistory.length === 0) {
     return null
   }
 
@@ -24,13 +26,13 @@ export default function SearchHistory() {
         </Button>
       </div>
       <div className="flex flex-wrap gap-2">
-        {searchHistory.map((query, index) => (
+        {searchHistory.map((query: string, index: number) => (
           <Button
             key={query}
             variant="secondary"
             size="sm"
             className={`text-xs glassmorphic max-w-full history-item-animate stagger-item-${Math.min(index + 1, 5)}`}
-            onClick={() => searchVideos(query, false)}
+            onClick={() => searchVideos(query)}
           >
             <span className="truncate">{query}</span>
           </Button>

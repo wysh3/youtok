@@ -1,10 +1,10 @@
 "use client"
 
-import { useVideo } from "@/context/video-context"
+import { useFavorites } from "@/context/favorites-context"
 import VideoCard from "@/components/video-card"
 
 export default function FavoritesList() {
-  const { favorites } = useVideo()
+  const { favorites } = useFavorites()
 
   if (favorites.length === 0) {
     return (
