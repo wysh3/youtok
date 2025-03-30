@@ -34,17 +34,6 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-## Project Structure
-
-```
-/app        - Next.js pages and layouts
-/components - UI components
-/context    - React context providers
-/hooks      - Custom React hooks
-/lib        - Utilities and API clients
-/types      - TypeScript definitions
-```
-
 ## Available Scripts
 
 - `npm run dev` - Start development server

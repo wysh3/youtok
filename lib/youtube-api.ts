@@ -1,4 +1,5 @@
 import type { Video } from "@/types/video";
+import { generateSummary } from "./ai-summary"; // Import the summarization function
 
 // Interfaces for expected Piped API response structures
 interface PipedVideoItem {
@@ -74,7 +75,7 @@ export async function fetchTrendingVideos(
 }
 
 // Function to fetch video details
-export async function fetchVideoDetails(videoId: string): Promise<Video | null> {
+export async function fetchVideoDetails(videoId: string, apiKey?: string): Promise<Video | null> { // Add optional apiKey
   try {
     const response = await fetch(`${PIPED_BASE_URL}/streams/${videoId}`);
     if (!response.ok) {
@@ -93,14 +94,31 @@ export async function fetchVideoDetails(videoId: string): Promise<Video | null> 
         ? data.subtitles[0].url
         : null;
 
-    return {
+    let aiSummaryResult: string | null = null; // Initialize AI summary result
+
+    // Attempt AI summarization if API key and description are available
+    if (apiKey && data.description) {
+      console.log(`Attempting AI summary for video ID: ${videoId}`); // Optional: for debugging
+      try {
+        aiSummaryResult = await generateSummary(data.description, apiKey);
+        console.log(`AI summary result: ${aiSummaryResult ? 'Success' : 'Failed or null'}`); // Optional: for debugging
+      } catch (summaryError) {
+        console.error(`Error generating AI summary for video ${videoId}:`, summaryError);
+        // Keep aiSummaryResult as null if summarization fails
+      }
+    }
+
+    const video: Video = {
       id: videoId,
       title: data.title,
       thumbnail: data.thumbnailUrl,
-      shortSummary: data.description || "",
-      longSummary: data.description || "", // Use description for summaries
-      transcriptUrl: transcript, // Add a transcript URL
+      shortSummary: data.description || "", // Keep original description as shortSummary for now
+      longSummary: data.description || "", // Keep original description as longSummary for now
+      transcriptUrl: transcript,
+      aiSummary: aiSummaryResult, // Add the AI summary result
     };
+
+    return video;
   } catch (error) {
     console.error("Error fetching video details:", error); // Keep console log
     throw error; // Re-throw

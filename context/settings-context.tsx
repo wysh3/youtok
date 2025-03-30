@@ -9,10 +9,11 @@ interface Settings {
   trendingTopic: string // e.g., "US", "IN"
   userTopics: string[] // User-defined topics for filtering
   viewMode: "trending" | "topics" // Which view is active
+  apiKey?: string // Add optional API Key
 }
 
 interface SettingsContextType {
-  settings: Settings
+  settings: Settings // This now includes apiKey implicitly
   updateSettings: (newSettings: Partial<Settings>) => void // Allow partial updates
 }
 
@@ -21,7 +22,8 @@ const defaultSettings: Settings = {
   saveHistory: true,
   trendingTopic: "US",
   userTopics: [],
-  viewMode: "trending"
+  viewMode: "trending",
+  apiKey: "" // Add default apiKey
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)

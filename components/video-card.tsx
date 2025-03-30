@@ -1,5 +1,7 @@
 "use client"
 
+import * as React from "react" // Import React for React.memo
+
 import { useState } from "react"
 import Image from "next/image"
 import { Heart } from "lucide-react"
@@ -13,7 +15,7 @@ interface VideoCardProps {
   video: Video
 }
 
-export default function VideoCard({ video }: VideoCardProps) {
+const VideoCardComponent = ({ video }: VideoCardProps) => { // Rename original component
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { toggleFavorite, isVideoFavorite } = useFavorites()
   const { addToHistory } = useHistory()
@@ -64,5 +66,8 @@ export default function VideoCard({ video }: VideoCardProps) {
       <VideoModal video={video} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   )
-}
+};
+
+// Export the memoized version
+export default React.memo(VideoCardComponent);
 

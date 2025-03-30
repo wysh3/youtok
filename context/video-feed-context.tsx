@@ -115,9 +115,10 @@ export function VideoFeedProvider({ children }: { children: ReactNode }) {
         setHasMoreTrending(false)
       }
     } catch (error) {
-      console.error("Error loading more trending videos:", error)
-      toast({ title: "Error", description: "Failed to load more videos.", variant: "destructive" })
-      setHasMoreTrending(false) // Stop pagination on error
+      // Log the error for debugging, but don't show a user-facing toast
+      // if it's likely just the end of the list being reached.
+      console.warn("Error loading more trending videos (potentially end of list):", error)
+      setHasMoreTrending(false) // Stop pagination on error or end of list
     } finally {
       setIsLoading(false)
     }
@@ -136,9 +137,10 @@ export function VideoFeedProvider({ children }: { children: ReactNode }) {
         setHasMoreTopicVideos(false)
       }
     } catch (error) {
-      console.error(`Error loading more videos for topic ${currentTopic}:`, error)
-      toast({ title: "Error", description: "Failed to load more videos.", variant: "destructive" })
-      setHasMoreTopicVideos(false) // Stop pagination on error
+      // Log the error for debugging, but don't show a user-facing toast
+      // if it's likely just the end of the list being reached for this topic.
+      console.warn(`Error loading more videos for topic ${currentTopic} (potentially end of list):`, error)
+      setHasMoreTopicVideos(false) // Stop pagination on error or end of list
     } finally {
       setIsLoading(false)
     }

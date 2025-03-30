@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import { X, Heart, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFavorites } from "@/context/favorites-context";
 import { useHistory } from "@/context/history-context";
 import type { Video } from "@/types/video";
+import { useSettings } from "@/context/settings-context"; // Import the custom hook
 import { fetchVideoDetails } from "@/lib/youtube-api";
 
 interface VideoModalProps {
@@ -19,6 +20,8 @@ interface VideoModalProps {
 export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) {
   const { toggleFavorite, isVideoFavorite } = useFavorites();
   const { addToHistory } = useHistory();
+  const { settings } = useSettings(); // Use the custom hook
+  const apiKey = settings?.apiKey;
   const [activeTab, setActiveTab] = useState("short");
   const [videoDetails, setVideoDetails] = useState<Video | null>(null);
   const [transcript, setTranscript] = useState<string | null>(null);
@@ -27,7 +30,8 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
     if (isOpen) {
       const loadVideoDetails = async () => {
         try {
-          const details = await fetchVideoDetails(video.id);
+          // Pass apiKey here
+          const details = await fetchVideoDetails(video.id, apiKey);
           setVideoDetails(details);
 
           // Fetch transcript if available
@@ -57,7 +61,7 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
       setVideoDetails(null); // Reset details when modal is closed
       setTranscript(null);
     }
-  }, [isOpen, video.id]);
+  }, [isOpen, video.id, apiKey, addToHistory]); // Added apiKey and addToHistory
 
   if (!isOpen) return null;
 
@@ -118,10 +122,21 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
               </TabsTrigger>
             </TabsList>
             <TabsContent value="short" className="mt-4">
-              <p>{videoDetails?.shortSummary || "Loading..."}</p>
+              <p className="text-sm text-muted-foreground">
+                {videoDetails?.aiSummary ? (
+                  <>
+                    <strong>AI Summary:</strong> {videoDetails.aiSummary}
+                  </>
+                ) : (
+                  videoDetails?.shortSummary || "Loading summary..." // Fallback to original short summary
+                )}
+              </p>
             </TabsContent>
             <TabsContent value="long" className="mt-4">
-              <p>{videoDetails?.longSummary || "Loading..."}</p>
+              {/* Kept long summary as is, but added similar styling */}
+              <p className="text-sm text-muted-foreground">
+                {videoDetails?.longSummary || "Loading detailed summary..."}
+              </p>
             </TabsContent>
             <TabsContent value="transcript" className="mt-4">
               <div className="max-h-60 overflow-y-auto">

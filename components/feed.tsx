@@ -22,10 +22,10 @@ export default function Feed() {
     isLoading
   } = useVideoFeed()
   const { settings, updateSettings } = useSettings()
-  const [loading, setLoading] = useState(true)
-  const [topicVideos, setTopicVideos] = useState<Record<string, any[]>>({})
-  const [activeTopicIndex, setActiveTopicIndex] = useState(0)
-  const [loadingMore, setLoadingMore] = useState(false)
+  // const [loading, setLoading] = useState(true); // Removed, use context isLoading
+  // const [topicVideos, setTopicVideos] = useState<Record<string, any[]>>({}); // Removed, use context videos
+  const [activeTopicIndex, setActiveTopicIndex] = useState(0) // Keep for UI highlighting
+  // const [loadingMore, setLoadingMore] = useState(false); // Removed, use context isLoading directly
 
   // Toggle between trending and topics view
   const handleViewModeChange = (value: string) => {
@@ -37,54 +37,11 @@ export default function Feed() {
     }
   }
 
-  // Load trending videos
-  useEffect(() => {
-    async function loadTrendingVideos() {
-      if (settings?.viewMode === "trending") {
-        setLoading(true)
-        try {
-          const trendingVideos = await fetchTrendingVideos(settings?.trendingTopic ?? "US", 1)
-          setVideos(trendingVideos)
-        } catch (error) {
-          console.error("Error fetching trending videos:", error)
-        } finally {
-          setLoading(false)
-        }
-      }
-    }
+  // Removed redundant useEffect for loading trending videos.
+  // VideoFeedProvider handles initial loading based on settings.
 
-    loadTrendingVideos()
-  }, [setVideos, settings?.trendingTopic, settings?.viewMode])
-
-  // Load topic videos
-  useEffect(() => {
-    async function loadTopicVideos() {
-      if (settings?.viewMode === "topics" && settings?.userTopics?.length > 0) {
-        setLoading(true)
-        try {
-          const activeTopic = settings.userTopics[activeTopicIndex]
-          
-          // Check if we already have videos for this topic
-          if (!topicVideos[activeTopic]) {
-            const videos = await fetchVideosByTopic(activeTopic, 1)
-            setTopicVideos(prev => ({
-              ...prev,
-              [activeTopic]: videos
-            }))
-            setVideos(videos)
-          } else {
-            setVideos(topicVideos[activeTopic])
-          }
-        } catch (error) {
-          console.error("Error fetching topic videos:", error)
-        } finally {
-          setLoading(false)
-        }
-      }
-    }
-
-    loadTopicVideos()
-  }, [settings?.viewMode, settings?.userTopics, activeTopicIndex, topicVideos])
+  // Removed redundant useEffect for loading topic videos.
+  // VideoFeedProvider handles loading when setCurrentTopic is called.
 
   // Handle topic change
   const handleTopicChange = async (index: number) => {
@@ -96,12 +53,13 @@ export default function Feed() {
     setActiveTopicIndex(index)
   }
 
-  if (loading) {
+  // Use context's isLoading for initial load indication
+  if (isLoading && videos.length === 0) {
     return (
       <div className="w-full p-4 flex justify-center items-center py-10">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   return (
@@ -161,14 +119,14 @@ export default function Feed() {
               videos={videos} 
               onLoadMore={loadMoreTrendingVideos} 
               hasMore={hasMoreTrending} 
-              isLoading={loadingMore} 
+              isLoading={isLoading} // Use context isLoading
             />
           ) : (
             <InfiniteFeed 
               videos={videos} 
               onLoadMore={loadMoreTopicVideos} 
               hasMore={hasMoreTopicVideos} 
-              isLoading={loadingMore} 
+              isLoading={isLoading} // Use context isLoading
             />
           )
         )

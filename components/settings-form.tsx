@@ -20,6 +20,7 @@ interface SettingsFormData {
   trendingTopic: string
   userTopics: string[]
   viewMode: "trending" | "topics"
+  apiKey?: string // Add API Key field
 }
 
 export default function SettingsForm() {
@@ -32,7 +33,8 @@ export default function SettingsForm() {
       saveHistory: settings?.saveHistory ?? true,
       trendingTopic: settings?.trendingTopic ?? "US",
       userTopics: settings?.userTopics ?? [],
-      viewMode: settings?.viewMode ?? "trending"
+      viewMode: settings?.viewMode ?? "trending",
+      apiKey: settings?.apiKey ?? "" // Add apiKey default
     }
   })
   
@@ -41,6 +43,7 @@ export default function SettingsForm() {
   const trendingTopic = watch("trendingTopic")
   const userTopics = watch("userTopics") ?? []
   const viewMode = watch("viewMode")
+  const apiKey = watch("apiKey") // Watch apiKey
 
   // Auto-save when form values change
   useEffect(() => {
@@ -57,7 +60,8 @@ export default function SettingsForm() {
         saveHistory,
         trendingTopic,
         userTopics,
-        viewMode
+        viewMode,
+        apiKey // Include apiKey in update
       })
 
       // Show subtle toast notification
@@ -71,7 +75,7 @@ export default function SettingsForm() {
     }, 500) // 500ms debounce
 
     return () => clearTimeout(timer)
-  }, [saveHistory, trendingTopic, userTopics, viewMode])
+  }, [saveHistory, trendingTopic, userTopics, viewMode, apiKey]) // Add apiKey dependency
 
   // Add a new topic
   const addTopic = () => {
@@ -162,6 +166,27 @@ export default function SettingsForm() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Google AI API Key Input */}
+      <div className="space-y-2">
+        <Label htmlFor="apiKey">Google AI API Key</Label>
+        <p className="text-sm text-muted-foreground">
+          Enter your Google AI API key for video summarization features. Your key is stored locally and never sent to our servers.
+        </p>
+        <Controller
+          name="apiKey"
+          control={control}
+          render={({ field }) => (
+            <input
+              id="apiKey"
+              type="password" // Mask the input
+              {...field}
+              placeholder="Enter your API Key"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          )}
+        />
       </div>
 
       <div className="flex items-center justify-between">
