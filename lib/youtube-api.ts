@@ -1,7 +1,10 @@
 import type { Video } from "@/types/video";
-import { generateSummary } from "./ai-summary"; // Import the summarization function
+// Remove unused imports for server-side libraries
+// import { generateSummary } from "./ai-summary"; // Summary generation will move to client/modal
+// import { YoutubeTranscript } from 'youtube-transcript';
+// import YTDlpWrap from 'yt-dlp-wrap';
 
-// Interfaces for expected Piped API response structures
+// Interfaces for expected Piped API response structures (Only needed for trending/search now)
 interface PipedVideoItem {
   url: string;
   title: string;
@@ -27,7 +30,7 @@ interface PipedStreamData {
   // Add other potential fields like videoStreams, audioStreams, duration
 }
 
-const PIPED_BASE_URL = "https://pipedapi.leptons.xyz";
+const PIPED_BASE_URL = "https://pipedapi.leptons.xyz"; // Reverted back to original instance
 
 // Function to extract video ID from a YouTube URL
 export function extractVideoId(url: string): string | null {
@@ -74,54 +77,53 @@ export async function fetchTrendingVideos(
   }
 }
 
-// Function to fetch video details
-export async function fetchVideoDetails(videoId: string, apiKey?: string): Promise<Video | null> { // Add optional apiKey
+// Function to fetch video details by calling the internal API route
+// Note: This function no longer generates the AI summary itself.
+// It calls the internal API route to get metadata and transcript content,
+// then constructs a full Video object (without the AI summary, which is generated client-side).
+export async function fetchVideoDetails(videoId: string): Promise<Video | null> {
   try {
-    const response = await fetch(`${PIPED_BASE_URL}/streams/${videoId}`);
+    console.log(`Calling internal API route for video details: /api/video-details/${videoId}`);
+    const response = await fetch(`/api/video-details/${videoId}`);
+
     if (!response.ok) {
-      // Handle 404 specifically as "not found" rather than a generic error
-      if (response.status === 404) {
-          return null; // Video not found is not necessarily an error state
-      }
-      throw new Error(`Error fetching video details: ${response.status} ${response.statusText}`);
-    }
-    const data: PipedStreamData = await response.json(); // Type the response data
-    console.log("Raw API response:", data); // Log the raw response
-
-    // Get the first subtitle track (if available)
-    const transcript =
-      data.subtitles && data.subtitles.length > 0
-        ? data.subtitles[0].url
-        : null;
-
-    let aiSummaryResult: string | null = null; // Initialize AI summary result
-
-    // Attempt AI summarization if API key and description are available
-    if (apiKey && data.description) {
-      console.log(`Attempting AI summary for video ID: ${videoId}`); // Optional: for debugging
+      // Attempt to parse error message from API response
+      let errorData = null;
       try {
-        aiSummaryResult = await generateSummary(data.description, apiKey);
-        console.log(`AI summary result: ${aiSummaryResult ? 'Success' : 'Failed or null'}`); // Optional: for debugging
-      } catch (summaryError) {
-        console.error(`Error generating AI summary for video ${videoId}:`, summaryError);
-        // Keep aiSummaryResult as null if summarization fails
+          errorData = await response.json();
+      } catch (parseErr) {
+          // Ignore if response body isn't valid JSON
       }
+      const errorMessage = errorData?.error || `API route failed with status: ${response.status}`;
+      console.error(`Error fetching video details from API route for ${videoId}: ${errorMessage}`);
+      // Handle specific statuses if needed (e.g., 404 for unavailable)
+      if (response.status === 404) {
+          console.log(`Video ${videoId} reported as unavailable by API route.`);
+      }
+      return null; // Return null on API error
     }
 
+    // The API route returns id, title, thumbnail, shortSummary, transcriptContent
+    const apiData = await response.json();
+    console.log(`Successfully fetched details from API route for ${videoId}`);
+
+    // Construct the full Video object
     const video: Video = {
-      id: videoId,
-      title: data.title,
-      thumbnail: data.thumbnailUrl,
-      shortSummary: data.description || "", // Keep original description as shortSummary for now
-      longSummary: data.description || "", // Keep original description as longSummary for now
-      transcriptUrl: transcript,
-      aiSummary: aiSummaryResult, // Add the AI summary result
+        id: apiData.id,
+        title: apiData.title || "Title not found",
+        thumbnail: apiData.thumbnail,
+        shortSummary: apiData.shortSummary || "",
+        longSummary: apiData.shortSummary || "", // Use shortSummary as fallback for longSummary for now
+        transcriptUrl: null, // Not provided by this flow
+        transcriptContent: apiData.transcriptContent,
+        aiSummary: null, // AI Summary will be generated client-side
     };
 
     return video;
+
   } catch (error) {
-    console.error("Error fetching video details:", error); // Keep console log
-    throw error; // Re-throw
+    console.error(`Network or other error calling internal API route for ${videoId}:`, error);
+    return null; // Return null on fetch error
   }
 }
 
@@ -188,4 +190,3 @@ export async function fetchVideosByTopic(topic: string, page = 1): Promise<Video
     throw error; // Re-throw
   }
 }
-

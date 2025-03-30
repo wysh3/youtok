@@ -10,9 +10,10 @@ import { useHistory } from "@/context/history-context";
 import type { Video } from "@/types/video";
 import { useSettings } from "@/context/settings-context"; // Import the custom hook
 import { fetchVideoDetails } from "@/lib/youtube-api";
+import { generateSummary } from "@/lib/ai-summary"; // Import summary generation
 
 interface VideoModalProps {
-  video: Video;
+  video: Video; // Initial video data (might just have id, title, thumbnail)
   isOpen: boolean;
   onClose: () => void;
 }
@@ -22,46 +23,67 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
   const { addToHistory } = useHistory();
   const { settings } = useSettings(); // Use the custom hook
   const apiKey = settings?.apiKey;
-  const [activeTab, setActiveTab] = useState("short");
-  const [videoDetails, setVideoDetails] = useState<Video | null>(null);
-  const [transcript, setTranscript] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("summary"); // Default to summary tab
+  // State to hold the full details fetched from API + generated summary
+  const [fullVideoDetails, setFullVideoDetails] = useState<Video | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Add error state
 
   useEffect(() => {
     if (isOpen) {
-      const loadVideoDetails = async () => {
-        try {
-          // Pass apiKey here
-          const details = await fetchVideoDetails(video.id, apiKey);
-          setVideoDetails(details);
+      const loadAndSummarize = async () => {
+        setIsLoading(true);
+        setError(null);
+        setFullVideoDetails(null); // Clear previous full details
 
-          // Fetch transcript if available
-          if (details?.transcriptUrl) {
-            const transcriptResponse = await fetch(details.transcriptUrl);
-            if (transcriptResponse.ok) {
-              const transcriptData = await transcriptResponse.text();
-              setTranscript(transcriptData);
-            } else {
-              console.error(
-                "Error fetching transcript:",
-                transcriptResponse.status
-              );
-              setTranscript("Transcript not available");
+        try {
+          // 1. Fetch details (metadata + transcript) from our API route
+          const detailsFromApi = await fetchVideoDetails(video.id);
+
+          if (!detailsFromApi) {
+            setError("Failed to load video details.");
+            setIsLoading(false);
+            return;
+          }
+
+          // 2. Generate AI Summary if transcript and API key are available
+          let aiSummaryResult: string | null = null;
+          if (detailsFromApi.transcriptContent && apiKey) {
+            console.log(`Modal: Attempting AI summary generation for ${video.id}`);
+            try {
+               aiSummaryResult = await generateSummary(detailsFromApi.transcriptContent, apiKey);
+               console.log(`Modal: AI summary result: ${aiSummaryResult ? 'Success' : 'Failed or null'}`);
+            } catch (summaryError) {
+               console.error(`Modal: Error generating AI summary for ${video.id}:`, summaryError);
+               // Keep aiSummaryResult null, maybe set a specific error message?
             }
           } else {
-            setTranscript("Transcript not available");
+             console.log(`Modal: Skipping AI summary for ${video.id} (no transcript or API key)`);
           }
-        } catch (error) {
-          console.error("Error loading video details:", error);
+
+          // 3. Combine initial video data, API data, and AI summary
+          setFullVideoDetails({
+            ...video, // Start with initial data (id, maybe title/thumb)
+            ...detailsFromApi, // Add data from API (title, thumb, desc, transcriptContent)
+            aiSummary: aiSummaryResult, // Add the generated summary
+          });
+
+        } catch (err) {
+          console.error("Modal: Error in loadAndSummarize:", err);
+          setError("An unexpected error occurred.");
+        } finally {
+          setIsLoading(false);
         }
       };
 
-      loadVideoDetails();
+      loadAndSummarize();
       addToHistory(video); // Add video to history when modal opens
     } else {
-      setVideoDetails(null); // Reset details when modal is closed
-      setTranscript(null);
+      setFullVideoDetails(null); // Reset details when modal is closed
+      setError(null);
     }
-  }, [isOpen, video.id, apiKey, addToHistory]); // Added apiKey and addToHistory
+    // Dependency array includes apiKey now as summary generation depends on it
+  }, [isOpen, video.id, video, apiKey, addToHistory]);
 
   if (!isOpen) return null;
 
@@ -109,39 +131,27 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
             </Button>
           </div>
 
-          <Tabs defaultValue="short" className="mb-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="short" onClick={() => setActiveTab("short")}>
-                Short Summary
-              </TabsTrigger>
-              <TabsTrigger value="long" onClick={() => setActiveTab("long")}>
-                Detailed Summary
-              </TabsTrigger>
-              <TabsTrigger value="transcript" onClick={() => setActiveTab("transcript")}>
-                Transcript
-              </TabsTrigger>
+          {error && <p className="text-red-500 text-sm mb-4">Error: {error}</p>}
+
+          <Tabs defaultValue="summary" value={activeTab} onValueChange={setActiveTab} className="mb-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="summary">Summary</TabsTrigger>
+              <TabsTrigger value="transcript">Transcript</TabsTrigger>
             </TabsList>
-            <TabsContent value="short" className="mt-4">
+            <TabsContent value="summary" className="mt-4">
               <p className="text-sm text-muted-foreground">
-                {videoDetails?.aiSummary ? (
-                  <>
-                    <strong>AI Summary:</strong> {videoDetails.aiSummary}
-                  </>
-                ) : (
-                  videoDetails?.shortSummary || "Loading summary..." // Fallback to original short summary
-                )}
-              </p>
-            </TabsContent>
-            <TabsContent value="long" className="mt-4">
-              {/* Kept long summary as is, but added similar styling */}
-              <p className="text-sm text-muted-foreground">
-                {videoDetails?.longSummary || "Loading detailed summary..."}
+                {isLoading ? "Loading summary..." :
+                 fullVideoDetails?.aiSummary ? fullVideoDetails.aiSummary : // Display AI summary if available
+                 fullVideoDetails?.transcriptContent ? "Generating summary..." : // Indicate if transcript exists but summary is pending/failed
+                 fullVideoDetails?.shortSummary ? `(Description): ${fullVideoDetails.shortSummary}` : // Fallback to description
+                 "Summary not available."}
               </p>
             </TabsContent>
             <TabsContent value="transcript" className="mt-4">
               <div className="max-h-60 overflow-y-auto">
                 <p className="text-sm whitespace-pre-line">
-                  {transcript || "Loading transcript..."}
+                  {isLoading ? "Loading transcript..." :
+                   fullVideoDetails?.transcriptContent || "Transcript not available."}
                 </p>
               </div>
             </TabsContent>
@@ -166,4 +176,3 @@ export default function VideoModal({ video, isOpen, onClose }: VideoModalProps) 
     </div>
   );
 }
-
